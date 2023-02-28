@@ -3,13 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Mvc;
-
-namespace dotnet_RPG.Controllers
+namespace dotnet_RPG.Services.CharacterService
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class CharacterController : ControllerBase
+    public class CharacterService : ICharacterService
     {
         private static List<Character> characters = new List<Character>{
             //Creating a lot of characters here for fun tho
@@ -74,25 +70,25 @@ namespace dotnet_RPG.Controllers
                     Class = RpgClass.Warrior
                 }
         };
-        private readonly ICharacterService _characterService;
+        
+        public List<Character> AddCharacter(Character newCharacter)
+        {
+            characters.Add(newCharacter);
+            return characters;
+        }
 
-        public CharacterController(ICharacterService characterService)
+        public List<Character> GetAllCharacters()
         {
-            _characterService = characterService;
+            return characters;
         }
-        [HttpGet("GetAll")]
-        public ActionResult<List<Character>> Get()
+
+        public Character GetCharacterById(int id)
         {
-            return Ok(_characterService.GetAllCharacters());
-        }
-        [HttpGet("{id}")]
-        public ActionResult<Character> GetSingle(int id){
-            return Ok(_characterService.GetCharacterById(id));
-        }
-        [HttpPost]
-        public ActionResult<List<Character>> AddCharacter(Character newCharacter){
-            
-            return Ok(_characterService.AddCharacter(newCharacter));
+            var character = characters.FirstOrDefault(c=> c.Id == id);
+            if(character is not null)
+                return character;
+
+            throw new Exception("Character not found"); 
         }
     }
 }
